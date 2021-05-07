@@ -1,5 +1,27 @@
-h1 { font-size: 25px;
-	color:red;
-	
+.caption{
+	font-size:12px;
 }
 
+h1 { font-size: 50px;
+	font-family: 'Merriweather', serif;
+}
+
+h2{
+	font-size: 25px;
+}
+
+h3{
+	font-style: italic;
+	font-size: 16px;
+}
+
+.subheader{
+	font-size: 25px;
+	font-family: 'Merriweather', serif;
+	font-style: bold;
+}
+
+h5{
+	font-size: 15px;
+	font-style: italic;
+}
