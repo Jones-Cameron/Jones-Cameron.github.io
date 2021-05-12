@@ -1,0 +1,14 @@
+h1 { 
+color: #990000;
+font-style: bold;
+font-size: 60px;
+font-family: 'Anton', sans-serif;
+ }
+
+ .col-sm, p {
+ 	font-family: courier;
+ }
+
+h2 {
+	font-size: 45px;
+}
