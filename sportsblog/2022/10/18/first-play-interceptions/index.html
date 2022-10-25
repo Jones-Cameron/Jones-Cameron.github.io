@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Hugo 0.104.3" />
+
+
+<title>First-Play-Interceptions - Sports Data Analysis</title>
+<meta property="og:title" content="First-Play-Interceptions - Sports Data Analysis">
+
+
+  <link href='https://Jones-Cameron.github.io/favicon.ico' rel='icon' type='image/x-icon'/>
+
+
+
+  
+
+
+
+
+
+
+
+
+<link href='//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css' rel='stylesheet' type='text/css' />
+
+
+
+<link rel="stylesheet" href="/css/fonts.css" media="all">
+<link rel="stylesheet" href="/css/main.css" media="all">
+
+
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="header">
+        <nav class="nav">
+  <a href="/" class="nav-logo">
+    <img src="/images/logo.png"
+         width="50"
+         height="50"
+         alt="Logo">
+  </a>
+
+  <ul class="nav-links">
+    
+    <li><a href="/about/">About</a></li>
+    
+    <li><a href="https://github.com/Jones-Cameron">GitHub</a></li>
+    
+    <li><a href="https://twitter.com">Twitter</a></li>
+    
+  </ul>
+</nav>
+
+      </header>
+
+
+<main class="content" role="main">
+
+  <article class="article">
+    
+    <span class="article-duration">6 min read</span>
+    
+
+    <h1 class="article-title">First-Play-Interceptions</h1>
+
+    
+    <span class="article-date">2022-10-18</span>
+    
+
+    <div class="article-content">
+      
+
+
+<pre class="r"><code>library(tidyverse)</code></pre>
+<pre><code>## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.2 ──
+## ✔ ggplot2 3.3.6     ✔ purrr   0.3.4
+## ✔ tibble  3.1.8     ✔ dplyr   1.0.9
+## ✔ tidyr   1.2.0     ✔ stringr 1.4.1
+## ✔ readr   2.1.2     ✔ forcats 0.5.2
+## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## ✖ dplyr::filter() masks stats::filter()
+## ✖ dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>library(tictoc)</code></pre>
+<pre class="r"><code>tictoc::tic()
+pbp &lt;- data.frame()
+seasons &lt;- 2014:cfbfastR:::most_recent_cfb_season()
+progressr::with_progress({
+
+  pbp &lt;- cfbfastR::load_cfb_pbp(seasons)
+})
+tictoc::toc()</code></pre>
+<pre><code>## 203.982 sec elapsed</code></pre>
+<p>##Find first plays from scrimmage in the first half - how many are there?
+A: We have two different data sets, so in one set we have 6899 plays and in the other we have 7385 plays</p>
+<pre class="r"><code>first_plays_game &lt;- pbp %&gt;% filter(firstD_by_poss == 1, lag_kickoff_play == 1, drive_number == 1, play_type != &#39;Penalty&#39;)
+first_plays_game2 &lt;- pbp %&gt;% filter(game_play_number == 2, play_type != &#39;Penalty&#39;)</code></pre>
+<p>##Count the number of play types for first plays from scrimmage to start the game.
+A: There are 18 play types for the first play in the game, not including the kickoff.</p>
+<pre class="r"><code>first_play_type &lt;- first_plays_game %&gt;% group_by(play_type) %&gt;% summarize(count=n()) %&gt;% arrange(desc(count))</code></pre>
+<pre class="r"><code>first_play_type2 &lt;- first_plays_game2 %&gt;% group_by(play_type) %&gt;% summarize(count=n()) %&gt;% arrange(desc(count))</code></pre>
+<p>##How many plays were pass plays - receptions, incompletions, sacks, interceptions - including those plays that resulted in a touchdown?
+A: In the first_play_type data set there are 3,082 pass plays and in the first_play_type2 data set I found 3,266 instances where the first play was a pass.</p>
+<pre class="r"><code>first_play_type %&gt;% filter(play_type == &quot;Pass Reception&quot; | play_type == &quot;Pass Incompletion&quot; | play_type == &quot;Passing Touchdown&quot; | play_type == &quot;Interception Return&quot; |play_type == &quot;Interception Return Touchdown&quot; | play_type == &quot;Sack&quot;)</code></pre>
+<pre><code>## # A tibble: 6 × 2
+##   play_type                     count
+##   &lt;chr&gt;                         &lt;int&gt;
+## 1 Pass Reception                 2074
+## 2 Pass Incompletion               813
+## 3 Sack                             85
+## 4 Passing Touchdown                72
+## 5 Interception Return              45
+## 6 Interception Return Touchdown     7</code></pre>
+<pre class="r"><code>first_play_type2 %&gt;% filter(play_type == &quot;Pass Reception&quot; | play_type == &quot;Pass Incompletion&quot; | play_type == &quot;Passing Touchdown&quot; | play_type == &quot;Interception Return&quot; |play_type == &quot;Interception Return Touchdown&quot; | play_type == &quot;Sack&quot;)</code></pre>
+<pre><code>## # A tibble: 6 × 2
+##   play_type                     count
+##   &lt;chr&gt;                         &lt;int&gt;
+## 1 Pass Reception                 2207
+## 2 Pass Incompletion               877
+## 3 Sack                             94
+## 4 Passing Touchdown                58
+## 5 Interception Return              40
+## 6 Interception Return Touchdown     8</code></pre>
+<p>##Isolate the number of first plays from scrimmage that began the game that resulted in an interception. How many are there? What percentage of all passing plays do they represent?
+A: In the first dataset there were 52 instances of a first play Interception and in the second dataset there were 48.</p>
+<pre class="r"><code>first_play_type %&gt;% filter(play_type == &quot;Interception Return&quot; | play_type == &quot;Interception Return Touchdown&quot;)</code></pre>
+<pre><code>## # A tibble: 2 × 2
+##   play_type                     count
+##   &lt;chr&gt;                         &lt;int&gt;
+## 1 Interception Return              45
+## 2 Interception Return Touchdown     7</code></pre>
+<pre class="r"><code>first_play_type2 %&gt;% filter(play_type == &quot;Interception Return&quot; | play_type == &quot;Interception Return Touchdown&quot;)</code></pre>
+<pre><code>## # A tibble: 2 × 2
+##   play_type                     count
+##   &lt;chr&gt;                         &lt;int&gt;
+## 1 Interception Return              40
+## 2 Interception Return Touchdown     8</code></pre>
+<p>##How many times has this happened each year we have data for?
+2014 was 6 times. 2015 was 9 times. 2016 was 7 times. 2017 was 6 times. 2018 was times. 2019 was 4 times. 2020 was 2 times. 2021 was 2 times. 2022 was 12 times.
+In the second set 2014 was 6 times. 2015 was 9 times. 2016 was 7 times. 2017 was 6 times. 2018 was 4 times. 2019 was 4 times. 2020 was 2 times. 2021 was 1 times. 2022 was 9 times.</p>
+<pre class="r"><code>first_play_year &lt;- first_plays_game %&gt;% group_by(year, play_type) %&gt;% summarize(count=n()) %&gt;% arrange(desc(count))</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;year&#39;. You can override using the
+## `.groups` argument.</code></pre>
+<pre class="r"><code>first_play_year %&gt;% filter(play_type == &quot;Interception Return&quot; | play_type == &quot;Interception Return Touchdown&quot;)</code></pre>
+<pre><code>## # A tibble: 14 × 3
+## # Groups:   year [9]
+##     year play_type                     count
+##    &lt;dbl&gt; &lt;chr&gt;                         &lt;int&gt;
+##  1  2022 Interception Return              12
+##  2  2015 Interception Return               7
+##  3  2014 Interception Return               6
+##  4  2016 Interception Return               5
+##  5  2017 Interception Return               5
+##  6  2019 Interception Return               4
+##  7  2018 Interception Return               3
+##  8  2015 Interception Return Touchdown     2
+##  9  2016 Interception Return Touchdown     2
+## 10  2021 Interception Return               2
+## 11  2017 Interception Return Touchdown     1
+## 12  2018 Interception Return Touchdown     1
+## 13  2020 Interception Return               1
+## 14  2020 Interception Return Touchdown     1</code></pre>
+<pre class="r"><code>first_play_year2 &lt;- first_plays_game2 %&gt;% group_by(year, play_type) %&gt;% summarize(count=n()) %&gt;% arrange(desc(count))</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;year&#39;. You can override using the
+## `.groups` argument.</code></pre>
+<pre class="r"><code>first_play_year2 %&gt;% filter(play_type == &quot;Interception Return&quot; | play_type == &quot;Interception Return Touchdown&quot;)</code></pre>
+<pre><code>## # A tibble: 15 × 3
+## # Groups:   year [9]
+##     year play_type                     count
+##    &lt;dbl&gt; &lt;chr&gt;                         &lt;int&gt;
+##  1  2022 Interception Return               8
+##  2  2015 Interception Return               7
+##  3  2014 Interception Return               6
+##  4  2016 Interception Return               5
+##  5  2017 Interception Return               5
+##  6  2019 Interception Return               4
+##  7  2018 Interception Return               3
+##  8  2015 Interception Return Touchdown     2
+##  9  2016 Interception Return Touchdown     2
+## 10  2017 Interception Return Touchdown     1
+## 11  2018 Interception Return Touchdown     1
+## 12  2020 Interception Return               1
+## 13  2020 Interception Return Touchdown     1
+## 14  2021 Interception Return               1
+## 15  2022 Interception Return Touchdown     1</code></pre>
+<p>##Which teams have done it more than once?
+According to this first set, Ball State, Indiana, Purdue, Tulsa and UAB have doen this twice.
+According to the second it was Ball State, Indiana, Purdue, Tulsa and UAB as well. The two find the same findings</p>
+<pre class="r"><code>first_play_team &lt;- first_plays_game %&gt;% group_by(pos_team, play_type) %&gt;% summarize(count=n()) %&gt;% arrange(desc(count))</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;pos_team&#39;. You can override using the
+## `.groups` argument.</code></pre>
+<pre class="r"><code>first_play_team %&gt;% filter(play_type == &quot;Interception Return&quot; | play_type == &quot;Interception Return Touchdown&quot;)</code></pre>
+<pre><code>## # A tibble: 47 × 3
+## # Groups:   pos_team [45]
+##    pos_team        play_type           count
+##    &lt;chr&gt;           &lt;chr&gt;               &lt;int&gt;
+##  1 Ball State      Interception Return     2
+##  2 Indiana         Interception Return     2
+##  3 Purdue          Interception Return     2
+##  4 Tulsa           Interception Return     2
+##  5 UAB             Interception Return     2
+##  6 Alabama         Interception Return     1
+##  7 Bethune-Cookman Interception Return     1
+##  8 Boston College  Interception Return     1
+##  9 Bowling Green   Interception Return     1
+## 10 BYU             Interception Return     1
+## # … with 37 more rows</code></pre>
+<pre class="r"><code>first_play_team2 &lt;- first_plays_game2 %&gt;% group_by(pos_team, play_type) %&gt;% summarize(count=n()) %&gt;% arrange(desc(count))</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;pos_team&#39;. You can override using the
+## `.groups` argument.</code></pre>
+<pre class="r"><code>first_play_team2 %&gt;% filter(play_type == &quot;Interception Return&quot; | play_type == &quot;Interception Return Touchdown&quot;)</code></pre>
+<pre><code>## # A tibble: 43 × 3
+## # Groups:   pos_team [40]
+##    pos_team       play_type                     count
+##    &lt;chr&gt;          &lt;chr&gt;                         &lt;int&gt;
+##  1 Ball State     Interception Return               2
+##  2 Indiana        Interception Return               2
+##  3 Purdue         Interception Return               2
+##  4 Tulsa          Interception Return               2
+##  5 UAB            Interception Return               2
+##  6 Alabama        Interception Return               1
+##  7 Boston College Interception Return               1
+##  8 Bowling Green  Interception Return               1
+##  9 BYU            Interception Return               1
+## 10 BYU            Interception Return Touchdown     1
+## # … with 33 more rows</code></pre>
+
+    </div>
+  </article>
+
+  
+
+
+</main>
+
+      <footer class="footer">
+        <ul class="footer-links">
+          <li>
+            <a href="/index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
+          </li>
+          <li>
+            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="/images/hugo-logo.png" alt="Img link to Hugo website" width="22" height="22"></a>
+          </li>
+        </ul>
+      </footer>
+
+    </div>
+    
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/r.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+<script>hljs.configure({languages: []}); hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+
+    
+  </body>
+</html>
+

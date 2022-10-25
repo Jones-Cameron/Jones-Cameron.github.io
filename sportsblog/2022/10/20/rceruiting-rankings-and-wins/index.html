@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Hugo 0.104.3" />
+
+
+<title>Rceruiting Rankings and Wins - Sports Data Analysis</title>
+<meta property="og:title" content="Rceruiting Rankings and Wins - Sports Data Analysis">
+
+
+  <link href='https://Jones-Cameron.github.io/favicon.ico' rel='icon' type='image/x-icon'/>
+
+
+
+  
+
+
+
+
+
+
+
+
+<link href='//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css' rel='stylesheet' type='text/css' />
+
+
+
+<link rel="stylesheet" href="/css/fonts.css" media="all">
+<link rel="stylesheet" href="/css/main.css" media="all">
+
+
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="header">
+        <nav class="nav">
+  <a href="/" class="nav-logo">
+    <img src="/images/logo.png"
+         width="50"
+         height="50"
+         alt="Logo">
+  </a>
+
+  <ul class="nav-links">
+    
+    <li><a href="/about/">About</a></li>
+    
+    <li><a href="https://github.com/Jones-Cameron">GitHub</a></li>
+    
+    <li><a href="https://twitter.com">Twitter</a></li>
+    
+  </ul>
+</nav>
+
+      </header>
+
+
+<main class="content" role="main">
+
+  <article class="article">
+    
+    <span class="article-duration">3 min read</span>
+    
+
+    <h1 class="article-title">Rceruiting Rankings and Wins</h1>
+
+    
+    <span class="article-date">2022-10-20</span>
+    
+
+    <div class="article-content">
+      
+
+
+<pre class="r"><code>library(tidyverse)</code></pre>
+<pre><code>## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.2 ──
+## ✔ ggplot2 3.3.6     ✔ purrr   0.3.4
+## ✔ tibble  3.1.8     ✔ dplyr   1.0.9
+## ✔ tidyr   1.2.0     ✔ stringr 1.4.1
+## ✔ readr   2.1.2     ✔ forcats 0.5.2
+## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## ✖ dplyr::filter() masks stats::filter()
+## ✖ dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>all_teams &lt;- read_csv(&quot;https://dwillis.github.io/sports-data-files/all_teams.csv&quot;)</code></pre>
+<pre><code>## Rows: 904 Columns: 21
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr  (3): team, conference, division
+## dbl (18): year, expected_wins, total_games, total_wins, total_losses, total_...
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>all_rankings &lt;- read_csv(&quot;https://dwillis.github.io/sports-data-files/all_rankings.csv&quot;)</code></pre>
+<pre><code>## Rows: 400 Columns: 3
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr (1): team
+## dbl (2): rating, year
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>all_data &lt;- all_rankings %&gt;% inner_join(all_teams, by=c(&quot;team&quot;,&quot;year&quot;))
+all_data</code></pre>
+<pre><code>## # A tibble: 350 × 22
+##    team     rating  year confe…¹ divis…² expec…³ total…⁴ total…⁵ total…⁶ total…⁷
+##    &lt;chr&gt;     &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;     &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+##  1 Alabama    328.  2021 SEC     West       11        15      13       2       0
+##  2 Ohio St…   322.  2021 Big Ten East        9.9      13      11       2       0
+##  3 LSU        295.  2021 SEC     West        7.2      13       6       7       0
+##  4 Georgia    294.  2021 SEC     East       13.9      15      14       1       0
+##  5 Clemson    291.  2021 ACC     Atlant…     8.7      13      10       3       0
+##  6 Oregon     287.  2021 Pac-12  North       9.8      14      10       4       0
+##  7 USC        281.  2021 Pac-12  South       3.5      12       4       8       0
+##  8 Texas A…   279.  2021 SEC     West        9        12       8       4       0
+##  9 Notre D…   269.  2021 FBS In… &lt;NA&gt;        9.8      13      11       2       0
+## 10 Oklahoma   268.  2021 Big 12  &lt;NA&gt;        8.4      13      11       2       0
+## # … with 340 more rows, 12 more variables: conference_games &lt;dbl&gt;,
+## #   conference_wins &lt;dbl&gt;, conference_losses &lt;dbl&gt;, conference_ties &lt;dbl&gt;,
+## #   home_games &lt;dbl&gt;, home_wins &lt;dbl&gt;, home_losses &lt;dbl&gt;, home_ties &lt;dbl&gt;,
+## #   away_games &lt;dbl&gt;, away_wins &lt;dbl&gt;, away_losses &lt;dbl&gt;, away_ties &lt;dbl&gt;, and
+## #   abbreviated variable names ¹​conference, ²​division, ³​expected_wins,
+## #   ⁴​total_games, ⁵​total_wins, ⁶​total_losses, ⁷​total_ties</code></pre>
+<pre class="r"><code>ggplot() + geom_point(data=all_data, aes(x=rating, y=total_wins))</code></pre>
+<p><img src="https://Jones-Cameron.github.io/2022/10/20/rceruiting-rankings-and-wins/index_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<pre class="r"><code>## rating as y variable
+ggplot() + 
+  geom_point(data=all_data, aes(x=total_wins, y=rating)) +
+  geom_smooth(data=all_data, aes(x=total_wins, y=rating), method=&quot;lm&quot;)</code></pre>
+<pre><code>## `geom_smooth()` using formula &#39;y ~ x&#39;</code></pre>
+<p><img src="https://Jones-Cameron.github.io/2022/10/20/rceruiting-rankings-and-wins/index_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<pre class="r"><code>##rating as x variable
+ggplot() + 
+  geom_point(data=all_data, aes(x=rating, y=total_wins)) +
+  geom_smooth(data=all_data, aes(x=rating, y=total_wins), method=&quot;lm&quot;)</code></pre>
+<pre><code>## `geom_smooth()` using formula &#39;y ~ x&#39;</code></pre>
+<p><img src="https://Jones-Cameron.github.io/2022/10/20/rceruiting-rankings-and-wins/index_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<pre class="r"><code>umd &lt;- all_data %&gt;% filter(team == &quot;Maryland&quot;)</code></pre>
+<pre class="r"><code>## rating as y variable
+ggplot() + 
+  geom_point(data=all_data, aes(x=total_wins, y=rating)) +
+  geom_smooth(data=all_data, aes(x=total_wins, y=rating), method=&quot;lm&quot;) +
+  geom_point(data=umd, aes(x=total_wins, y=rating), color=&quot;red&quot;)</code></pre>
+<pre><code>## `geom_smooth()` using formula &#39;y ~ x&#39;</code></pre>
+<p><img src="https://Jones-Cameron.github.io/2022/10/20/rceruiting-rankings-and-wins/index_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+
+    </div>
+  </article>
+
+  
+
+
+</main>
+
+      <footer class="footer">
+        <ul class="footer-links">
+          <li>
+            <a href="/index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
+          </li>
+          <li>
+            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="/images/hugo-logo.png" alt="Img link to Hugo website" width="22" height="22"></a>
+          </li>
+        </ul>
+      </footer>
+
+    </div>
+    
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/r.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+<script>hljs.configure({languages: []}); hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+
+    
+  </body>
+</html>
+
